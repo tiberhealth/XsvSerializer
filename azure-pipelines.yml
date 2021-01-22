@@ -1,0 +1,41 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  
+name: '1.0.$(Rev:r)'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build Library'
+  inputs:
+    command: 'build'
+    projects: 'Tiberhealth.XsvSerializer/Tiberhealth.XsvSerializer.csproj'
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(Build.BuildNumber)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Library'
+  inputs:
+    command: 'test'
+    projects: 'XsvSerializer.Test/XsvSerializer.Test.csproj'
+    testRunTitle: 'Multipart Serializer Test'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish library'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'Tiberhealth.XsvSerializer/Tiberhealth.XsvSerializer.csproj'
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(Build.BuildNumber)'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'Pack Library'
+  inputs:
+    command: 'pack'
+    packagesToPack: Tiberhealth.XsvSerializer/Tiberhealth.XsvSerializer.csproj'
+    versioningScheme: 'byBuildNumber'
+
