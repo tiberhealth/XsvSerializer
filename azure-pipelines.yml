@@ -36,6 +36,6 @@ steps:
   displayName: 'Pack Library'
   inputs:
     command: 'pack'
-    packagesToPack: Tiberhealth.XsvSerializer/Tiberhealth.XsvSerializer.csproj'
+    packagesToPack: 'Tiberhealth.XsvSerializer/Tiberhealth.XsvSerializer.csproj'
     versioningScheme: 'byBuildNumber'
 
