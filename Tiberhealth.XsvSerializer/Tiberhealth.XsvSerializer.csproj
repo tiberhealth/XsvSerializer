@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <Authors>Bryan M Lenihan</Authors>
+    <Copyright>2021</Copyright>
+    <PackageIconUrl>https://cdn.tiberhealth.com/assets/TiberLogoImage_1E384B_128Icon.png</PackageIconUrl>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Owners>Tiber Health innovations, Inc.</Owners>
+    <PackageProjectUrl>https://github.com/tiberhealth/XsvSerializer</PackageProjectUrl>
+    <Summary>Deserializes xSV files to C# Objects</Summary>
+    <PackageTags>csv, tsv, comma,seperated,tab,POCO,serialization</PackageTags>
+    <Title>xSV Serializer</Title>
+    <Description>Serialize xSV files to C# objects.  </Description>
   </PropertyGroup>
 
   <ItemGroup>
