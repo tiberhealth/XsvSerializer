@@ -4,54 +4,56 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Tiberhealth.XsvSerializer.Extensions;
 
 namespace Tiberhealth.XsvSerializer
 {
-    public class XsvReader<TResult> : IEnumerable<TResult>
-        where TResult : class, new()
+    /// <summary>
+    /// Reader to transforms/deserialize an Xsv file stream to objects.
+    /// </summary>
+    public abstract class XsvReader
     {
+        protected char Delimiter { get; set; }
+
         private Stream SourceStream { get; }
-
         private int BufferSize { get; }
-
-        private long _currentPosition = 0;
-        private long _dataPosition = 0;
-
         private byte[] _buffer;
-        private char _delimiter = ',';
 
         private int _bufferPos =>
             this._currentPosition < this.BufferSize
-                ? (int) this._currentPosition
+                ? (int)this._currentPosition
                 : Convert.ToInt32(this._currentPosition % this.BufferSize);
 
-        public XsvReader(Stream stream, int bufferSize = 10)
+        protected long _currentPosition = 0;
+        protected long _dataPosition = 0;
+
+        protected long CurrentPosition => this._currentPosition;
+
+        protected XsvReader(Stream stream, int bufferSize = 10)
         {
             this.SourceStream = stream;
             this.BufferSize = bufferSize;
 
             this._buffer = new byte[this.BufferSize];
-
-            var header = this.FirstOrDefault();
-            this._dataPosition = this._currentPosition; // After getting the header - save the position
+            this._dataPosition = 0;
         }
 
-        public IEnumerator<TResult> GetEnumerator() => new XsvReaderEnumerator<TResult>(this);
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
-        internal void Reset()
+        /// <summary>
+        /// Sets the position of the data elements (right after the header)
+        /// </summary>
+        /// <param name="position">The position to set it, or NULL to set it at the current position.</param>
+        /// <returns>XsvReader object for chaining</returns>
+        protected XsvReader SetDataPosition(long? position = null)
         {
-            this._currentPosition = this._dataPosition;
-            this.LoadBuffer();
+            this._dataPosition = position ?? this._currentPosition;
+            return this;
         }
 
-        internal TResult GetNext()
-        {
-            var xsvLine = this.GetNextLine();
-            return xsvLine.Any() ? new TResult() : null;
-        }
-
-        private IEnumerable<string> GetNextLine()
+        /// <summary>
+        /// Main logic for getting the next line in the XSV file
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<string> GetNextLine()
         {
             var stringParts = new List<string>();
             var bytes = new List<byte>();
@@ -62,12 +64,11 @@ namespace Tiberhealth.XsvSerializer
             {
                 if (this._currentPosition >= this.SourceStream.Length) break;
                 if (this._bufferPos == 0) this.LoadBuffer();
-                var currentByte = (char) this._buffer[this._bufferPos];
+                var currentByte = (char)this._buffer[this._bufferPos];
                 this._currentPosition += 1;
 
                 switch (currentByte)
                 {
-                    case '\'':
                     case '"':
                         if (inQuotes && beginQuote == currentByte)
                         {
@@ -87,22 +88,22 @@ namespace Tiberhealth.XsvSerializer
                             break;
                         }
 
-                        bytes.Add((byte) currentByte);
+                        bytes.Add((byte)currentByte);
                         break;
 
                     case '\r':
-                        if (inQuotes) bytes.Add((byte) currentByte);
+                        if (inQuotes) bytes.Add((byte)currentByte);
                         break;
 
                     default:
-                        if (currentByte == this._delimiter)
+                        if (currentByte == this.Delimiter && !inQuotes)
                         {
                             stringParts.Add(Encoding.UTF8.GetString(bytes.ToArray()));
                             bytes.Clear();
                             break;
                         }
 
-                        bytes.Add((byte) currentByte);
+                        bytes.Add((byte)currentByte);
                         break;
                 }
             }
@@ -127,5 +128,60 @@ namespace Tiberhealth.XsvSerializer
 
             if (_currentPosition < 0) this._currentPosition = 0;
         }
+
+        internal void Reset()
+        {
+            this._currentPosition = this._dataPosition;
+            this.LoadBuffer();
+        }
+    }
+
+    /// <summary>
+    /// Reader to transforms/deserialize an Xsv file stream to objects.
+    /// </summary>
+    /// <typeparam name="TResult">The resulting object </typeparam>
+    public class XsvReader<TResult> : XsvReader, IEnumerable<TResult>
+        where TResult : class, new()
+    {
+
+        private readonly Mapper<TResult> _mapper;
+
+        /// <summary>
+        /// Constructor for the deserialization reader
+        /// </summary>
+        /// <param name="stream">Stream containing the XSV Information</param>
+        /// <param name="bufferSize"></param>
+        public XsvReader(Stream stream, char? delimiter = null, int bufferSize = 10) : base(stream, bufferSize)
+        {
+            this.Delimiter = delimiter ?? this.DetermineDelimiter();
+
+            this._mapper = new Mapper<TResult>(this);
+            this.SetDataPosition(); 
+        }
+
+        /// <summary>
+        /// The enumerator to transverse the data and objects of the CSV file.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<TResult> GetEnumerator() => new XsvReaderEnumerator<TResult>(this);
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        /// <summary>
+        /// Gets the next object based on the position of the stream
+        /// </summary>
+        /// <returns>The generated object based on the stream position.</returns>
+        internal TResult GetNext()
+        {
+            var xsvLine = this.GetNextLine();
+            return xsvLine.Any() ? this._mapper.MapObject(xsvLine, out var warnings) : null;
+        }
+
+        private char DetermineDelimiter()
+        {
+            if (typeof(TResult).HasCustomAttribute<XsvObjectAttribute>(out var attribute)) return attribute.Delimiter;
+
+            return ',';
+        }
+
     }
 }
