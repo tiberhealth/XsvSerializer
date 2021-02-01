@@ -28,10 +28,11 @@ namespace XsvSerializer.Test
             [Xsv("Rate")]
             public decimal HourlyRate { get; set; }
             public DateTime BirthDate { get; set; }
+            public DateTime? LastUpdate { get; set; }
         }
 
-        private string CsvString = "Name,Age,Rate,BirthDate\n\"Lenihan, Bryan\",49,12.25,06/04/1971\n\"Lenihan, Susan\",48,17.45,01/12/1972";
-        private string TsvString = "Name\tAge\tRate\tBirthDate\n\"Lenihan, Bryan\"\t49\t12.25\t06/04/1971\n\"Lenihan\tSusan\"\t48\t17.45\t01/12/1972";
+        private string CsvString = "Name,Age,Rate,BirthDate,LastUpdate\n\"Lenihan, Bryan\",49,12.25,06/04/1971,\n\"Lenihan, Susan\",48,17.45,01/12/1972,02/01/2021";
+        private string TsvString = "Name\tAge\tRate\tBirthDate\n\"Lenihan, Bryan\"\t49\t12.25\t06/04/1971\t\n\"Lenihan\tSusan\"\t48\t17.45\t01/12/1972\t2/1/2021";
 
         [Test]
         public async Task DeserializeCsvBasic()
@@ -50,6 +51,12 @@ namespace XsvSerializer.Test
             Assert.AreEqual(12.25, returnObj.First().HourlyRate);
 
             Assert.AreEqual(DateTime.Parse("01/12/1972"), returnObj.Last().BirthDate);
+
+            var array = returnObj.ToArray();
+            Assert.IsFalse(array[0].LastUpdate.HasValue);
+            Assert.IsTrue(array[1].LastUpdate.HasValue);
+
+            Assert.AreEqual(DateTime.Parse("02/01/2021"), array[1].LastUpdate);
         }
 
         [Test]
