@@ -18,6 +18,5 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="Models\JenzTest\" />
   </ItemGroup>
 </Project>
