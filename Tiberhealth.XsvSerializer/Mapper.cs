@@ -55,16 +55,21 @@ namespace Tiberhealth.XsvSerializer
             foreach (var key in this._map.Keys)
             {
                 var property = this._map[key];
+                var propType = property.PropertyType;
 
-                object typedValue = null;
-                if (property.PropertyType.IsValueType)
-                {
-                    typedValue = Activator.CreateInstance(property.PropertyType);
-                }
+                object typedValue = default;
 
                 try
                 {
-                    typedValue = Convert.ChangeType(xsvValues[key], property.PropertyType);
+                    if (propType.IsGenericType)
+                    {
+                        var nullableType = Nullable.GetUnderlyingType(propType);
+                        if (nullableType == null) throw new NotSupportedException("Generic type definitions are not support");
+
+                        propType = nullableType;
+                    }
+
+                    typedValue = string.IsNullOrWhiteSpace(xsvValues[key]) ? null : Convert.ChangeType(xsvValues[key].Trim(), propType);
                 }
                 catch (Exception ex)
                 {
