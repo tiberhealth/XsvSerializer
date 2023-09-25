@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <Authors>Bryan M Lenihan</Authors>
     <Copyright>2021</Copyright>
     <PackageIconUrl>https://cdn.tiberhealth.com/assets/TiberLogoImage_1E384B_128Icon.png</PackageIconUrl>
@@ -18,6 +20,6 @@
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
