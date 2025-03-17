@@ -1,5 +1,4 @@
-﻿using System;
-namespace Tiberhealth.XsvSerializer.Exceptions
+﻿namespace Tiberhealth.XsvSerializer.Exceptions
 {
     public class FieldNotDefinedException: Exception
     {

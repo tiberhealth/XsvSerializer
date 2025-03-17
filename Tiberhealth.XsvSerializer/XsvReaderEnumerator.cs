@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
-
 namespace Tiberhealth.XsvSerializer
 {
     internal class XsvReaderEnumerator<TResult>: IEnumerator<TResult>

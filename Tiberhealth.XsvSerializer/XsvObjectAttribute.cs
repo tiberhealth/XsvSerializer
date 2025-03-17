@@ -1,5 +1,4 @@
-﻿using System;
-namespace Tiberhealth.XsvSerializer
+﻿namespace Tiberhealth.XsvSerializer
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class XsvObjectAttribute: Attribute

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-namespace Tiberhealth.XsvSerializer
+﻿namespace Tiberhealth.XsvSerializer
 {
     public class XsvSerializer
     {

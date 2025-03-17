@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Tiberhealth.XsvSerializer.Exceptions;
-using Tiberhealth.XsvSerializer.Extensions;
-
 namespace Tiberhealth.XsvSerializer
 {
     internal class Mapper<TType> where TType : class, new()

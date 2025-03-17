@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tiberhealth.XsvSerializer
+﻿namespace Tiberhealth.XsvSerializer
 {
     /// <summary>
     /// Attribute to help describe or instruct the Xsv renderer

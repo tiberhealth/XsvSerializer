@@ -1,9 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Newtonsoft.Json;
-using System.Text.Json.Serialization;
-
-namespace Tiberhealth.XsvSerializer.Extensions
+﻿namespace Tiberhealth.XsvSerializer.Extensions
 {
     public static class PropertyInfoExtensions
     {

@@ -1,5 +1,3 @@
-using System;
-
 namespace Tiberhealth.Exceptions
 {
     internal class ForwardOnlyException: Exception
